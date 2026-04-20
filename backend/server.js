@@ -26,10 +26,19 @@ app.get('/', (req, res) => {
 });
 
 // Config route for mobile app to discover dynamic URLs
-app.get('/api/config', (req, res) => {
-  res.json({
-    ragApiUrl: process.env.RAG_API_URL || 'http://192.168.29.57:8000'
-  });
+const SystemConfig = require('./models/SystemConfig');
+app.get('/api/config', async (req, res) => {
+  try {
+    const config = await SystemConfig.findOne({ name: 'production_config' });
+    res.json({
+      ragApiUrl: config?.ragApiUrl || process.env.RAG_API_URL || 'http://192.168.29.57:8000'
+    });
+  } catch (error) {
+    console.error("Config fetch error", error);
+    res.json({
+      ragApiUrl: process.env.RAG_API_URL || 'http://192.168.29.57:8000'
+    });
+  }
 });
 
 // Routes
