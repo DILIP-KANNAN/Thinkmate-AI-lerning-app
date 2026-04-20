@@ -1,0 +1,37 @@
+# node_modules
+node_modules/
+
+# Environment
+.env
+.env.development
+.env.production
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage directory
+coverage
+*.lcov
+.nyc_output
+
+# Compiled binary addons
+build/Release
+
+# IDEs
+.idea/
+.vscode/
+
+# OS generated files
+.DS_Store
+
+# Ad-hoc testing scripts and dummy files
+*_test.js
+test_*.js
+dummy.pdf
+
+# Uploaded documents / session data
+public/docs/
