@@ -25,6 +25,13 @@ app.get('/', (req, res) => {
   res.send('AI Learning App API is running');
 });
 
+// Config route for mobile app to discover dynamic URLs
+app.get('/api/config', (req, res) => {
+  res.json({
+    ragApiUrl: process.env.RAG_API_URL || 'http://192.168.29.57:8000'
+  });
+});
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));

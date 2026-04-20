@@ -9,9 +9,7 @@ import { useAuthContext, API_URL } from '../contexts/AuthContext';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Wait, the RAG API might run on another port. User's python API runs typically on 8000.
-// We will assign a dynamic fallback pointing to the usual loc.
-const RAG_API_URL = 'http://192.168.29.57:8000';
+// Dynamic config now handled via AuthContext
 
 interface RAGLayoutProps {
   moduleName: string; // Express DB Enum: 'exam-assistance', 'concept-explanation', etc.
@@ -23,7 +21,7 @@ interface RAGLayoutProps {
 
 export default function RAGLayout({ moduleName, title, description, icon: Icon, ragEndpoint }: RAGLayoutProps) {
   const router = useRouter();
-  const { user } = useAuthContext();
+  const { user, ragApiUrl } = useAuthContext();
   const { selectedNotes } = useAILearnContext();
   const { subjects, notesBySubject } = useMyNotesContext();
   
@@ -189,7 +187,7 @@ export default function RAGLayout({ moduleName, title, description, icon: Icon, 
           reqBody.marks_per_question = 5;
        }
 
-       const response = await fetch(`${RAG_API_URL}${ragEndpoint}`, {
+       const response = await fetch(`${ragApiUrl || 'http://192.168.29.57:8000'}${ragEndpoint}`, {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify(reqBody)

@@ -2,10 +2,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-// Since the android simulator often runs on 10.0.2.2 or we use ngrok,
-// local web/ios usually works with localhost.
-// Note: If testing on Android emulator, change to http://10.0.2.2:5000/api
-export const API_URL = 'http://192.168.29.57:5000/api';
+// Use your live Render Node API permanently, but support local overrides via .env
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://thinkmate-backend-api.onrender.com/api';
 
 export interface User {
   _id?: string;
@@ -25,6 +23,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
+  ragApiUrl: string | null;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => Promise<boolean>;
   updateProfile: (data: { name?: string, institution?: string, subjects?: string[] }) => Promise<void>;
@@ -37,10 +36,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [ragApiUrl, setRagApiUrl] = useState<string | null>(null);
 
   useEffect(() => {
     loadUser();
+    fetchConfig();
   }, []);
+
+  const fetchConfig = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/config`);
+      setRagApiUrl(res.data.ragApiUrl);
+    } catch (e) {
+      console.log('Failed to load dynamic server config:', e);
+      // Fallback
+      setRagApiUrl('http://192.168.29.57:8000');
+    }
+  };
 
   const loadUser = async () => {
     try {
@@ -112,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, signup, updateProfile, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, ragApiUrl, login, signup, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );
