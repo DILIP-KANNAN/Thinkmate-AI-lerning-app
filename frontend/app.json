@@ -11,6 +11,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.dilip.thinkmate"
     },
     "web": {
       "bundler": "metro",
@@ -21,6 +22,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1ecd3f2e-e926-4703-abd3-f22a971f91ec"
+      }
     }
   }
 }
