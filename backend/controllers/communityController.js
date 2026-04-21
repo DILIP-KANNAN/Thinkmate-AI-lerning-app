@@ -5,6 +5,15 @@ const User = require('../models/User');
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
+const SystemConfig = require('../models/SystemConfig');
+
+async function getRagApiUrl() {
+  try {
+     const config = await SystemConfig.findOne({ name: 'production_config' });
+     if (config && config.ragApiUrl) return config.ragApiUrl;
+  } catch(e) {}
+  return process.env.RAG_API_URL || 'http://127.0.0.1:8000';
+}
 
 async function syncToRagBackend(userId, subject, topic, filePath, filename) {
   try {
@@ -14,7 +23,7 @@ async function syncToRagBackend(userId, subject, topic, filePath, filename) {
     formData.append('topic', topic || 'General');
     formData.append('file', fs.createReadStream(filePath), filename);
 
-    const RAG_API_URL = process.env.RAG_API_URL || 'http://127.0.0.1:8000';
+    const RAG_API_URL = await getRagApiUrl();
     await axios.post(`${RAG_API_URL}/upload`, formData, {
       headers: { ...formData.getHeaders() }
     });
@@ -58,7 +67,10 @@ exports.createCommunity = async (req, res) => {
     if (req.file) {
        const userId = req.user._id.toString();
        // Our storage routes dynamically to /docs/:userId/:filename
-       const fileUrl = `${req.protocol}://${req.get('host')}/docs/${userId}/${req.file.filename}`;
+       let fileUrl = `${req.protocol}://${req.get('host')}/docs/${userId}/${req.file.filename}`;
+       if (fileUrl.includes('onrender.com')) {
+           fileUrl = fileUrl.replace('http://', 'https://');
+       }
        
        newDoc = await Document.create({
          community: newCommunity._id,
@@ -110,7 +122,10 @@ exports.uploadPersonalDocument = async (req, res) => {
     }
 
     const userId = req.user._id.toString();
-    const fileUrl = `${req.protocol}://${req.get('host')}/docs/${userId}/${req.file.filename}`;
+    let fileUrl = `${req.protocol}://${req.get('host')}/docs/${userId}/${req.file.filename}`;
+    if (fileUrl.includes('onrender.com')) {
+        fileUrl = fileUrl.replace('http://', 'https://');
+    }
     
     const newDoc = await Document.create({
       community: req.params.id,

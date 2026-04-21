@@ -4,6 +4,15 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
+const SystemConfig = require('../models/SystemConfig');
+
+async function getRagApiUrl() {
+  try {
+     const config = await SystemConfig.findOne({ name: 'production_config' });
+     if (config && config.ragApiUrl) return config.ragApiUrl;
+  } catch(e) {}
+  return process.env.RAG_API_URL || 'http://127.0.0.1:8000';
+}
 
 // @desc    Get all chat sessions for user
 // @route   GET /api/chats
@@ -135,7 +144,7 @@ const syncSelectedNotesToRag = async (req, res) => {
 
           isFirst = false;
 
-          const RAG_API_URL = process.env.RAG_API_URL || 'http://127.0.0.1:8000';
+          const RAG_API_URL = await getRagApiUrl();
           const backendRes = await axios.post(`${RAG_API_URL}/upload`, formData, {
             headers: { ...formData.getHeaders() }
           });
