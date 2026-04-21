@@ -149,26 +149,42 @@ export default function AILearnScreen() {
                   <Text className="text-indigo-200">No active AI sessions found.</Text>
                 </View>
              )}
-             {chatHistory.map(session => (
-                <View key={session._id} className="bg-white/10 border border-white/20 rounded-2xl p-4 w-60 mr-4">
-                  <View className="flex-row justify-between items-start mb-2">
-                     <View className="bg-indigo-400/30 px-2 py-1 rounded-md">
-                        <Text className="text-indigo-100 text-[10px] font-bold uppercase tracking-wider">{session.module.split('-').join(' ')}</Text>
+             {chatHistory.map(session => {
+                const routeMapping: any = {
+                  "/home/ai-learn/question-generator": "/question-generator",
+                  "/home/ai-learn/concept-explanation": "/concept-explanation",
+                  "/home/ai-learn/exam-assistance": "/exam-assistance",
+                  "/home/ai-learn/summary-creator": "/summary-creator"
+                };
+                const destRoute = routeMapping[session.module] || "/";
+                
+                return (
+                 <Link 
+                   key={session._id} 
+                   href={{ pathname: destRoute, params: { chatId: session._id } }} 
+                   asChild
+                 >
+                   <TouchableOpacity className="bg-white/10 border border-white/20 rounded-2xl p-4 w-60 mr-4">
+                     <View className="flex-row justify-between items-start mb-2">
+                        <View className="bg-indigo-400/30 px-2 py-1 rounded-md">
+                           <Text className="text-indigo-100 text-[10px] font-bold uppercase tracking-wider">{session.module.split('-').join(' ')}</Text>
+                        </View>
+                        <TouchableOpacity 
+                           className="bg-white/10 p-1.5 rounded-full" 
+                           onPress={() => Alert.alert("Share Session", "Session link successfully copied to clipboard!")}
+                        >
+                           <Share2 size={14} color="#e0e7ff" />
+                        </TouchableOpacity>
                      </View>
-                     <TouchableOpacity 
-                        className="bg-white/10 p-1.5 rounded-full" 
-                        onPress={() => Alert.alert("Share Session", "Session link successfully copied to clipboard!")}
-                     >
-                        <Share2 size={14} color="#e0e7ff" />
-                     </TouchableOpacity>
-                  </View>
-                  <Text className="text-white font-semibold text-base mb-1" numberOfLines={1}>{getSessionTitle(session)}</Text>
-                  <View className="flex-row items-center gap-1 mt-2">
-                     <Clock size={12} color="#c7d2fe" />
-                     <Text className="text-indigo-200 text-xs">{formatSessionDate(session.updatedAt)}</Text>
-                  </View>
-                </View>
-             ))}
+                     <Text className="text-white font-semibold text-base mb-1" numberOfLines={1}>{getSessionTitle(session)}</Text>
+                     <View className="flex-row items-center gap-1 mt-2">
+                        <Clock size={12} color="#c7d2fe" />
+                        <Text className="text-indigo-200 text-xs">{formatSessionDate(session.updatedAt)}</Text>
+                     </View>
+                   </TouchableOpacity>
+                 </Link>
+                );
+             })}
           </ScrollView>
         </View>
 

@@ -27,6 +27,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => Promise<boolean>;
   updateProfile: (data: { name?: string, institution?: string, subjects?: string[] }) => Promise<void>;
+  refreshUser: () => Promise<void>;
   logout: () => void;
 }
 
@@ -124,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, ragApiUrl, login, signup, updateProfile, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, ragApiUrl, login, signup, updateProfile, refreshUser: loadUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

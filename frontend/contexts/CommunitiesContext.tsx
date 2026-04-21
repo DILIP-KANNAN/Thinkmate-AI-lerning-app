@@ -37,7 +37,7 @@ export function CommunitiesProvider({ children }: { children: ReactNode }) {
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { user } = useAuthContext();
+  const { user, refreshUser } = useAuthContext();
 
   useEffect(() => {
     if (user?.isAuthenticated) {
@@ -70,8 +70,8 @@ export function CommunitiesProvider({ children }: { children: ReactNode }) {
   const enrollInCommunity = async (communityId: string) => {
     try {
       await axios.post(`${API_URL}/communities/enroll`, { communityId });
-      // In a real app we'd mutate the user via AuthContext or reload data
-      // For now we'll just reload communities so membersCount updates
+      // Mutate the user natively so they immediately drop out of the Suggested array natively!
+      if (refreshUser) await refreshUser();
       await loadData();
     } catch (err) {
       console.log("Failed to enroll", err);
