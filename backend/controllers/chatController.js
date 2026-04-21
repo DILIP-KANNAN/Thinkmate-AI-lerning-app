@@ -108,21 +108,35 @@ const syncSelectedNotesToRag = async (req, res) => {
       if (!doc.url) continue;
       
       const urlObj = new URL(doc.url);
-      const pathname = decodeURIComponent(urlObj.pathname);
-      const localPath = path.join(__dirname, '../public', pathname.replace('/docs/', 'docs/'));
+      const decodedPathname = decodeURIComponent(urlObj.pathname);
+      const rawPathname = urlObj.pathname;
       
-      if (fs.existsSync(localPath)) {
+      let localPath = path.join(__dirname, '../public', decodedPathname.replace('/docs/', 'docs/'));
+      let rawLocalPath = path.join(__dirname, '../public', rawPathname.replace('/docs/', 'docs/'));
+      
+      let targetPath = null;
+      if (fs.existsSync(localPath)) targetPath = localPath;
+      else if (fs.existsSync(rawLocalPath)) targetPath = rawLocalPath;
+      
+      console.log("SYNC-RAG DEBUG: Verifying document for extraction");
+      console.log("Original URL:", doc.url);
+      console.log("Calculated Decoded Path:", localPath);
+      console.log("Calculated Raw Path:", rawLocalPath);
+      console.log("File Found?", targetPath !== null);
+      
+      if (targetPath) {
         try {
           const formData = new FormData();
           formData.append('user_id', userId);
           formData.append('subject', doc.subject || 'General');
           formData.append('topic', doc.topic || 'General');
           formData.append('clear_first', isFirst ? 'true' : 'false');
-          formData.append('file', fs.createReadStream(localPath), doc.title);
+          formData.append('file', fs.createReadStream(targetPath), doc.title);
 
           isFirst = false;
 
-          const backendRes = await axios.post('http://127.0.0.1:8000/upload', formData, {
+          const RAG_API_URL = process.env.RAG_API_URL || 'http://127.0.0.1:8000';
+          const backendRes = await axios.post(`${RAG_API_URL}/upload`, formData, {
             headers: { ...formData.getHeaders() }
           });
           

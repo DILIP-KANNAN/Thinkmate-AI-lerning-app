@@ -14,7 +14,8 @@ async function syncToRagBackend(userId, subject, topic, filePath, filename) {
     formData.append('topic', topic || 'General');
     formData.append('file', fs.createReadStream(filePath), filename);
 
-    await axios.post('http://127.0.0.1:8000/upload', formData, {
+    const RAG_API_URL = process.env.RAG_API_URL || 'http://127.0.0.1:8000';
+    await axios.post(`${RAG_API_URL}/upload`, formData, {
       headers: { ...formData.getHeaders() }
     });
     console.log(`Successfully synced ${filename} to RAG backend for user ${userId}`);
