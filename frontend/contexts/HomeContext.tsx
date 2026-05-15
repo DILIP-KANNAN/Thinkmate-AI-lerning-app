@@ -15,6 +15,9 @@ export interface StudyTask {
 interface HomeContextType {
   studyTasks: StudyTask[];
   setStudyTasks: React.Dispatch<React.SetStateAction<StudyTask[]>>;
+  generateStudyPlan: (subject: string, deadline: string) => Promise<any>;
+  addManualTask: (subject: string, date: string, taskTitle: string, time: string, priority: string) => Promise<any>;
+  fetchTasks: () => Promise<void>;
 }
 
 const HomeContext = createContext<HomeContextType | undefined>(undefined);
@@ -40,8 +43,37 @@ export function HomeProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const generateStudyPlan = async (subject: string, deadline: string) => {
+    try {
+      const response = await axios.post(`${API_URL}/planner/generate`, { subject, deadline });
+      await fetchTasks();
+      return response.data;
+    } catch (error) {
+      console.error('Failed to generate study plan:', error);
+      throw error;
+    }
+  };
+
+  const addManualTask = async (subject: string, date: string, taskTitle: string, time: string, priority: string) => {
+    try {
+      // Create a task manually via the general /tasks endpoint
+      const response = await axios.post(`${API_URL}/tasks`, {
+        subject,
+        task: taskTitle,
+        date,
+        time,
+        priority
+      });
+      await fetchTasks();
+      return response.data;
+    } catch (error) {
+      console.error('Failed to add manual task:', error);
+      throw error;
+    }
+  };
+
   return (
-    <HomeContext.Provider value={{ studyTasks, setStudyTasks }}>
+    <HomeContext.Provider value={{ studyTasks, setStudyTasks, generateStudyPlan, addManualTask, fetchTasks }}>
       {children}
     </HomeContext.Provider>
   );

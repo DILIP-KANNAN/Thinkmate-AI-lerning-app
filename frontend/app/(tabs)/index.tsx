@@ -71,14 +71,15 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </Link>
 
-            {/* Actually, Planner might have its own stack but let's assume it goes to notes or a planner screen. */}
-            <TouchableOpacity className="w-[48%] bg-white rounded-2xl p-5 shadow-sm">
-              <View className="bg-green-100 rounded-full p-3 w-12 h-12 items-center justify-center mb-3">
-                <Calendar size={24} color="#16a34a" />
-              </View>
-              <Text className="text-sm font-medium text-gray-900 mb-1">Study Planner</Text>
-              <Text className="text-xs text-gray-500">Organize schedule</Text>
-            </TouchableOpacity>
+            <Link href="/(tabs)/path" asChild>
+              <TouchableOpacity className="w-[48%] bg-white rounded-2xl p-5 shadow-sm">
+                <View className="bg-green-100 rounded-full p-3 w-12 h-12 items-center justify-center mb-3">
+                  <Calendar size={24} color="#16a34a" />
+                </View>
+                <Text className="text-sm font-medium text-gray-900 mb-1">Study Planner</Text>
+                <Text className="text-xs text-gray-500">Organize schedule</Text>
+              </TouchableOpacity>
+            </Link>
 
             <Link href="/ai-learn" asChild>
               <TouchableOpacity className="w-[48%] bg-white rounded-2xl p-5 shadow-sm">

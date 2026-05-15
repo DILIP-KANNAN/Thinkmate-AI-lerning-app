@@ -10,6 +10,10 @@ dotenv.config();
 // Connect to database
 connectDB();
 
+// Start Agenda Scheduler
+const { startScheduler } = require('./services/scheduler');
+startScheduler();
+
 const app = express();
 
 // Middleware
@@ -46,6 +50,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/communities', require('./routes/communityRoutes'));
 app.use('/api/chats', require('./routes/chatRoutes'));
+app.use('/api/planner', require('./routes/plannerRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

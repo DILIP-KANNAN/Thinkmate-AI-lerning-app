@@ -8,5 +8,6 @@ router.post('/login', authController.loginUser);
 router.get('/me', protect, authController.getMe);
 router.put('/me', protect, authController.updateProfile);
 router.get('/notes', protect, authController.getPersonalNotes);
+router.post('/push-token', protect, authController.savePushToken);
 
 module.exports = router;

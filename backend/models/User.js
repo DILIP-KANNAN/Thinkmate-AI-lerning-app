@@ -42,6 +42,10 @@ const userSchema = new mongoose.Schema({
   activeDays: {
     type: Number,
     default: 1,
+  },
+  expoPushToken: {
+    type: String,
+    default: '',
   }
 }, {
   timestamps: true
